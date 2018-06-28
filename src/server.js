@@ -1,22 +1,20 @@
 const express = require('express');
 const server = express();
-const { Client } = require('pg');
-const todoRoutes = require('./routes/todos');
+const todosRouter = require('./todos/todosRouter');
+const bodyParser = require('body-parser'); 
 
 
 async function startServer() {
-  const PORT = process.env['PORT'];
-  const client = new Client({
-    connectionString: process.env['DATABASE_URL']
-  });
+  const PORT = process.env.PORT;
+
 
   return new Promise(async (resolve, reject) => {
     try {
-      await client.connect();
 
-      server.listen(PORT, () => console.log(`Server running on ${PORT}`));
+      server.use(bodyParser.json())
       server.get('/', (req, res) => res.status(200).send('hello'));
-      server.use('/todos/', todoRoutes);
+      server.use('/todos/', todosRouter);
+      server.listen(PORT, () => console.log(`Server running on ${PORT}`));
 
       resolve(server);
 
@@ -27,11 +25,10 @@ async function startServer() {
   });
 }
 
-
 if (require.main === module) {
   startServer();
 }
 
 module.exports = {
-  startServer
+  startServer,
 };

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "an interview exercise",
   "scripts": {
+    "knex": "knex --knexfile ./src/knexfile.js",
     "start": "node src/server.js",
     "test:server:integration": "mocha test src/**/*.integration.test.js --exit"
   },
@@ -12,5 +13,9 @@
     "express": "^4.16.3",
     "pg": "^7.4.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "knex": "^0.14.6",
+    "node-pg-migrate": "^3.5.1"
+  }
 }
