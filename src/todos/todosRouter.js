@@ -9,10 +9,19 @@ router.get('/', async (req, res) => {
   res.json(todos);
 });
 
-router.get('/:id', (req, res) => {
-  TodosModel
-    .getTodoById(req.params.id)
-    .then(result => res.json(result));
+router.get('/:id', async (req, res) => {
+  try {
+    const todo = await TodosModel
+      .getTodoById(req.params.id);
+
+    res.json(todo);
+  } catch (error) {
+    if (true) {
+      res.status(404).json(error);
+    } else {
+      res.status(500).json({});
+    }
+  }
 });
 
 router.post('/', async (req, res) => {

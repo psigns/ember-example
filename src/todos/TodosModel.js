@@ -8,16 +8,29 @@ class TodosModel {
   }
 
   static async getTodoById(id) {
-    return knex('todos').where('id', id);
+    const todos = await knex('todos').where('id', id);
+
+    if (todos.length) {
+      return todos[0];
+    } else {
+      throw new Error('no results found');
+    }
   }
 
   static async createTodo(text) {
-    return knex('todos')
+    const todos = await knex('todos')
       .insert({
         text,
         status: 'INCOMPLETE',
       })
       .returning(['id', 'text', 'status']);
+
+    return todos.length ? todos[0] : null;
+  }
+
+  static async deleteAllTodos() {
+    return knex('todos')
+      .del();
   }
 
   static async deleteTodoById(id) {
