@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "an interview exercise",
   "scripts": {
-    "knex": "knex --knexfile ./src/knexfile.js",
-    "start": "node src/server.js",
-    "test:server:integration": "mocha test src/**/*.integration.test.js --exit"
+    "knex": "knex --knexfile ./src/server/knexfile.js",
+    "start": "node src/server/server.js",
+    "test:server:integration": "mocha test src/server/**/*.integration.test.js --exit"
   },
   "author": "Phillip Saenz <phillipsaenz@gmail.com>",
   "dependencies": {
