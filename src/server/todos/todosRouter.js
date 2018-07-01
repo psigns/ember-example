@@ -4,6 +4,14 @@ const TodoHistoryModel = require('./TodoHistoryModel');
 
 const router = express.Router();
 
+router.get('/history', async (req, res) => {
+  const allTodoHistoryEvents = await TodoHistoryModel
+    .getAllTodoHistoryEvents();
+
+  console.log(JSON.stringify(allTodoHistoryEvents));
+  res.json(allTodoHistoryEvents);
+});
+
 router.get('/', async (req, res) => {
   const todos = await TodosModel.getAllTodos();
 
@@ -66,5 +74,6 @@ router.delete('/:id', async (req, res) => {
 
   res.status(204).json({});
 });
+
 
 module.exports = router;

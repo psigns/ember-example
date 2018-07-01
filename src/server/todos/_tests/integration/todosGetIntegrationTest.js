@@ -2,6 +2,7 @@ const { assert } = require('chai');
 const request = require('supertest');
 const { startServer } = require('../../../server.js');
 const TodosModel = require('../../TodosModel');
+const TodoHistoryModel = require('../../TodoHistoryModel');
 
 
 module.exports = function() {
@@ -14,6 +15,7 @@ module.exports = function() {
 
     beforeEach(async function() {
       await TodosModel.deleteAllTodos();
+      await TodoHistoryModel.deleteAllTodoHistoryEvents();
     });
 
     it('responds with a 200', function() {
@@ -67,13 +69,14 @@ module.exports = function() {
 
     beforeEach(async function() {
       await TodosModel.deleteAllTodos();
+      await TodoHistoryModel.deleteAllTodoHistoryEvents();
     });
 
     it('returns a single todo object with the correct id', async function() {
       const todo = await TodosModel.createTodo('todo 1');
 
-    const response = await request(app)
-      .get(`/todos/${todo.id}`);
+      const response = await request(app)
+        .get(`/todos/${todo.id}`);
 
       assert(response.body.text === todo.text);
       assert(response.body.id === todo.id);
@@ -85,6 +88,35 @@ module.exports = function() {
         .get(`/todos/${1115}`);
 
       assert(response.status === 404);
+    });
+
+  });
+
+  describe('GET todos/history', function() {
+    let app;
+
+    before(function(done) {
+      startServer().then(function(server) {
+        app = server;
+        done();
+      });
+    });
+
+    beforeEach(async function() {
+      await TodosModel.deleteAllTodos();
+      await TodoHistoryModel.deleteAllTodoHistoryEvents();
+    });
+
+
+    it('returns a list of todo history events', async function() {
+      const postResponse = await request(app)
+        .post(`/todos/`)
+        .send({ text: 'a new todo' });
+
+      const historyResponse = await request(app)
+        .get('/todos/history');
+
+      assert(historyResponse.body.length === 1);
     });
   });
 };
