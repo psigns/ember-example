@@ -2,6 +2,7 @@ const { assert } = require('chai');
 const request = require('supertest');
 const { startServer, db } = require('../../../server.js');
 const TodosModel = require('../../TodosModel');
+const TodoHistoryModel = require('../../TodoHistoryModel');
 
 
 module.exports = function() {
@@ -14,6 +15,7 @@ module.exports = function() {
 
     beforeEach(async function() {
       await TodosModel.deleteAllTodos();
+      await TodoHistoryModel.deleteAllTodoHistoryEvents();
     });
 
     it('updates an existing todo in the database', async function() {
@@ -79,6 +81,24 @@ module.exports = function() {
         });
 
       assert(response.status === 404);
+    });
+
+    it('creates an edit history event', async function() {
+      const todo = await TodosModel.createTodo('todo 1');
+
+      const response = await request(app)
+        .put(`/todos/${todo.id}`)
+        .send({
+          id: todo.id,
+          status: 'COMPLETE',
+          text: 'new text',
+        });
+
+      const allTodoEvents = await TodoHistoryModel.getAllTodoHistoryEvents();
+
+      assert(allTodoEvents.length === 1);
+      assert(allTodoEvents[0].todo_id === todo.id);
+      assert(allTodoEvents[0].action.type === 'EDIT');
     });
   });
 };

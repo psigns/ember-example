@@ -2,6 +2,7 @@ const { assert } = require('chai');
 const request = require('supertest');
 const { startServer, db } = require('../../../server.js');
 const TodosModel = require('../../TodosModel');
+const TodoHistoryModel = require('../../TodoHistoryModel');
 
 
 module.exports = function() {
@@ -14,13 +15,34 @@ module.exports = function() {
 
     beforeEach(async function() {
       await TodosModel.deleteAllTodos();
+      await TodoHistoryModel.deleteAllTodoHistoryEvents();
     });
 
     it('creates a new todo in the database', async function() {
-      const todo = await TodosModel.createTodo('todo 1');
+      const newTodoText = 'a new todo';
+      const response = await request(app)
+        .post('/todos')
+        .send({ text: newTodoText });
       const allTodosFromDb = await TodosModel.getAllTodos(); 
 
       assert(allTodosFromDb.length === 1);
+      assert(allTodosFromDb[0].text === newTodoText);
+      assert(allTodosFromDb[0].status === 'INCOMPLETE');
+    });
+
+    it('creates a new create event in the todo_history table', async function() {
+      const newTodoText = 'a new todo';
+      const response = await request(app)
+        .post('/todos')
+        .send({ text: newTodoText });
+
+      const allTodoHistoryEvents = await TodoHistoryModel.getAllTodoHistoryEvents(); 
+
+      assert(allTodoHistoryEvents.length === 1);
+      assert(allTodoHistoryEvents[0].action.type === 'CREATE');
+      assert(allTodoHistoryEvents[0].hasOwnProperty('date'));
+      assert(allTodoHistoryEvents[0].date !== null);
+      assert(allTodoHistoryEvents[0].todo_id === response.body.id);
     });
 
     it('returns newly created todo in response body', async function() {

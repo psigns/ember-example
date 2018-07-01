@@ -1,5 +1,6 @@
 const express = require('express');
 const TodosModel = require('./TodosModel');
+const TodoHistoryModel = require('./TodoHistoryModel');
 
 const router = express.Router();
 
@@ -24,12 +25,14 @@ router.post('/', async (req, res) => {
   if (!req.body.text) {
     res.status(400).json({ error: 'bad request' });
   } else {
-    TodosModel
-      .createTodo(req.body.text)
-      .then(result => res.json(result));
+    const newTodo = await TodosModel
+      .createTodo(req.body.text);
+
+    await TodoHistoryModel.createCreateEvent(newTodo.id);
+
+    res.json(newTodo);
   }
 });
-
 
 router.put('/:id', async (req, res) => {
   if (!req.body.id || Number(req.params.id) !== Number(req.body.id)) {
@@ -45,20 +48,23 @@ router.put('/:id', async (req, res) => {
     try {
       const updatedTodo = await TodosModel.updateTodo(requestTodo);
 
-      return res.json(updatedTodo);
+      await TodoHistoryModel.createEditEvent(req.body.id);
 
+      return res.json(updatedTodo);
     } catch (error) {
       res.status(404).json({ error });
     }
   }
 });
 
-
 router.delete('/:id', async (req, res) => {
-  TodosModel
-    .deleteTodoById(req.params.id)
-    .then(() => res.status(204).json({}));
-});
+  const deleteTodo = await TodosModel
+    .deleteTodoById(req.params.id);
 
+  const deletionHistoryEvent = await TodoHistoryModel
+    .createDeleteEvent(req.params.id);
+
+  res.status(204).json({});
+});
 
 module.exports = router;
