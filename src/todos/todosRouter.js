@@ -16,11 +16,7 @@ router.get('/:id', async (req, res) => {
 
     res.json(todo);
   } catch (error) {
-    if (true) {
-      res.status(404).json(error);
-    } else {
-      res.status(500).json({});
-    }
+    res.status(404).json({ error });
   }
 });
 
@@ -46,9 +42,14 @@ router.put('/:id', async (req, res) => {
       status: req.body.status
     }; 
 
-    const updatedTodo = await TodosModel.updateTodo(requestTodo);
+    try {
+      const updatedTodo = await TodosModel.updateTodo(requestTodo);
 
-    res.json(updatedTodo);
+      return res.json(updatedTodo);
+
+    } catch (error) {
+      res.status(404).json({ error });
+    }
   }
 });
 

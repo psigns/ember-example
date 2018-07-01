@@ -8,11 +8,14 @@ class TodosModel {
   }
 
   static async getTodoById(id) {
-    const todos = await knex('todos').where('id', id);
-
-    if (todos.length) {
-      return todos[0];
-    } else {
+    try {
+      const todos = await knex.select().from('todos').where('id', id);
+      if (todos.length) {
+        return todos[0];
+      } else {
+        throw new Error('no results found');
+      }
+    } catch(e) {
       throw new Error('no results found');
     }
   }
@@ -45,13 +48,20 @@ class TodosModel {
     try {
       const oldTodo = await this.getTodoById(id);
       
-      if (oldTodo && oldTodo.length) {
-        return knex('todos')
+      if (oldTodo) {
+        const updatedTodo = await knex('todos')
           .where('id', id)
           .update({
             status,
             text,
-          });
+          })
+          .returning(['id', 'text', 'status']);
+
+        if (updatedTodo.length) {
+          return updatedTodo[0];
+        } else {
+          throw new Error('no results found');
+        }
       }
     } catch (error) {
       throw error;
