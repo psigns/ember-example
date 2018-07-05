@@ -8,14 +8,13 @@ router.get('/history', async (req, res) => {
   const allTodoHistoryEvents = await TodoHistoryModel
     .getAllTodoHistoryEvents();
 
-  console.log(JSON.stringify(allTodoHistoryEvents));
   res.json(allTodoHistoryEvents);
 });
 
 router.get('/', async (req, res) => {
   const todos = await TodosModel.getAllTodos();
 
-  res.json(todos);
+  res.json({ todos });
 });
 
 router.get('/:id', async (req, res) => {
@@ -30,38 +29,33 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  if (!req.body.text) {
+  if (!req.body.todo.text) {
     res.status(400).json({ error: 'bad request' });
   } else {
     const newTodo = await TodosModel
-      .createTodo(req.body.text);
+      .createTodo(req.body.todo.text);
 
     await TodoHistoryModel.createCreateEvent(newTodo.id);
 
-    res.json(newTodo);
+    res.json({ todo: newTodo });
   }
 });
 
 router.put('/:id', async (req, res) => {
-  if (!req.body.id || Number(req.params.id) !== Number(req.body.id)) {
-    res.status(400).json({ error: "bad request" });
-  } else {
+  const requestTodo = {
+    id: req.params.id,
+    text: req.body.todo.text,
+    status: req.body.todo.status
+  }; 
 
-    const requestTodo = {
-      id: req.body.id,
-      text: req.body.text,
-      status: req.body.status
-    }; 
+  try {
+    const updatedTodo = await TodosModel.updateTodo(requestTodo);
 
-    try {
-      const updatedTodo = await TodosModel.updateTodo(requestTodo);
+    await TodoHistoryModel.createEditEvent(req.params.id);
 
-      await TodoHistoryModel.createEditEvent(req.body.id);
-
-      return res.json(updatedTodo);
-    } catch (error) {
-      res.status(404).json({ error });
-    }
+    return res.json(updatedTodo);
+  } catch (error) {
+    res.status(404).json({ error });
   }
 });
 

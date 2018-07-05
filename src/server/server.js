@@ -1,7 +1,9 @@
 const express = require('express');
-const server = express();
-const todosRouter = require('./todos/todosRouter');
+const app = express();
 const bodyParser = require('body-parser'); 
+const todosRouter = require('./todos/todosRouter');
+const path = require('path');
+const { baseTodoRoute } = require('./constants/RouteConstants');
 
 
 async function startServer() {
@@ -11,12 +13,15 @@ async function startServer() {
   return new Promise(async (resolve, reject) => {
     try {
 
-      server.use(bodyParser.json())
-      server.get('/', (req, res) => res.status(200).send('hello'));
-      server.use('/todos/', todosRouter);
-      server.listen(PORT, () => console.log(`Server running on ${PORT}`));
+      app.use(bodyParser.json());
 
-      resolve(server);
+      app.use(express.static(path.join(__dirname, '../client/dist/')));
+
+      app.use(baseTodoRoute, todosRouter);
+
+      app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+
+      resolve(app);
 
     } catch (error) {
       console.log(JSON.stringify(error));

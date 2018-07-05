@@ -3,6 +3,7 @@ const request = require('supertest');
 const { startServer, db } = require('../../../server.js');
 const TodosModel = require('../../TodosModel');
 const TodoHistoryModel = require('../../TodoHistoryModel');
+const { baseTodoRoute } = require('../../../constants/RouteConstants');
 
 
 module.exports = function() {
@@ -21,8 +22,8 @@ module.exports = function() {
     it('creates a new todo in the database', async function() {
       const newTodoText = 'a new todo';
       const response = await request(app)
-        .post('/todos')
-        .send({ text: newTodoText });
+        .post(baseTodoRoute)
+        .send({ todo: { text: newTodoText }});
       const allTodosFromDb = await TodosModel.getAllTodos(); 
 
       assert(allTodosFromDb.length === 1);
@@ -33,8 +34,8 @@ module.exports = function() {
     it('creates a new create event in the todo_history table', async function() {
       const newTodoText = 'a new todo';
       const response = await request(app)
-        .post('/todos')
-        .send({ text: newTodoText });
+        .post(baseTodoRoute)
+        .send({ todo: { text: newTodoText }});
 
       const allTodoHistoryEvents = await TodoHistoryModel.getAllTodoHistoryEvents(); 
 
@@ -42,28 +43,28 @@ module.exports = function() {
       assert(allTodoHistoryEvents[0].action.type === 'CREATE');
       assert(allTodoHistoryEvents[0].hasOwnProperty('date'));
       assert(allTodoHistoryEvents[0].date !== null);
-      assert(allTodoHistoryEvents[0].todo_id === response.body.id);
+      assert(allTodoHistoryEvents[0].todo_id === response.body.todo.id);
     });
 
     it('returns newly created todo in response body', async function() {
       const newTodoText = 'a new todo';
       const response = await request(app)
-        .post('/todos')
-        .send({ text: newTodoText });
+        .post(baseTodoRoute)
+        .send({ todo: { text: newTodoText }});
 
-      assert(response.body.hasOwnProperty('id'));
-      assert(response.body.hasOwnProperty('status'));
-      assert(response.body.hasOwnProperty('text'));
-      assert(response.body.text === newTodoText);
+      assert(response.body.todo.hasOwnProperty('id'));
+      assert(response.body.todo.hasOwnProperty('status'));
+      assert(response.body.todo.hasOwnProperty('text'));
+      assert(response.body.todo.text === newTodoText);
     });
 
     it('newly created todos have INCOMPLETE status', async function() {
       const newTodoText = 'a new todo';
       const response = await request(app)
-        .post('/todos')
-        .send({ text: newTodoText });
+        .post(baseTodoRoute)
+        .send({ todo: { text: newTodoText }});
 
-      assert(response.body.status === 'INCOMPLETE');
+      assert(response.body.todo.status === 'INCOMPLETE');
     });
   });
 };

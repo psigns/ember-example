@@ -22,7 +22,7 @@ module.exports = function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .delete(`/todos/${todo.id}`);
+        .delete(`/api/todos/${todo.id}`);
 
       const allTodos = await TodosModel.getAllTodos(); 
 
@@ -33,7 +33,7 @@ module.exports = function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .delete(`/todos/${todo.id}`);
+        .delete(`/api/todos/${todo.id}`);
 
       const allTodoEvents = await TodoHistoryModel.getAllTodoHistoryEvents();
 

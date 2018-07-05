@@ -9,7 +9,11 @@ class TodosModel {
 
   static async getTodoById(id) {
     try {
-      const todos = await knex.select().from('todos').where('id', id);
+      const todos = await knex
+        .select()
+        .from('todos')
+        .where('id', id)
+        .orderBy('id', 'asc');
       if (todos.length) {
         return todos[0];
       } else {

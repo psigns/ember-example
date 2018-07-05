@@ -3,6 +3,7 @@ const request = require('supertest');
 const { startServer, db } = require('../../../server.js');
 const TodosModel = require('../../TodosModel');
 const TodoHistoryModel = require('../../TodoHistoryModel');
+const { baseTodoRoute } = require('../../../constants/RouteConstants');
 
 
 module.exports = function() {
@@ -24,11 +25,12 @@ module.exports = function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .put(`/todos/${todo.id}`)
+        .put(`${baseTodoRoute}/${todo.id}`)
         .send({
-          id: todo.id,
-          status: updatedTodoStatus,
-          text: updatedTodoText,
+          todo: {
+            status: updatedTodoStatus,
+            text: updatedTodoText,
+          }
         });
 
       const updatedTodo = await TodosModel.getTodoById(todo.id);
@@ -43,11 +45,12 @@ module.exports = function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .put(`/todos/${todo.id}`)
-        .send({
-          id: todo.id,
-          status: updatedTodoStatus,
-          text: updatedTodoText,
+        .put(`${baseTodoRoute}/${todo.id}`)
+        .send({ 
+          todo: {
+            status: updatedTodoStatus,
+            text: updatedTodoText,
+          }
         });
 
       assert(response.body.hasOwnProperty('id'));
@@ -55,29 +58,16 @@ module.exports = function() {
       assert(response.body.hasOwnProperty('text'));
     });
 
-    it('returns a 400 status if the payload todo id does not match id parameter', async function() {
-      const todo = await TodosModel.createTodo('todo 1');
-
-      const response = await request(app)
-        .put(`/todos/${todo.id}`)
-        .send({
-          id: todo.id + 1,
-          status: 'COMPLETE',
-          text: 'new text',
-        });
-
-      assert(response.status === 400);
-    });
-
     it('returns a 404 status if the todo does not exist', async function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .put(`/todos/${todo.id + 1}`)
+        .put(`${baseTodoRoute}/${todo.id + 1}`)
         .send({
-          id: todo.id + 1,
-          status: 'COMPLETE',
-          text: 'new text',
+          todo: {
+            status: 'COMPLETE',
+            text: 'new text',
+          }
         });
 
       assert(response.status === 404);
@@ -87,11 +77,12 @@ module.exports = function() {
       const todo = await TodosModel.createTodo('todo 1');
 
       const response = await request(app)
-        .put(`/todos/${todo.id}`)
+        .put(`${baseTodoRoute}/${todo.id}`)
         .send({
-          id: todo.id,
-          status: 'COMPLETE',
-          text: 'new text',
+          todo: {
+            status: 'COMPLETE',
+            text: 'new text',
+          }
         });
 
       const allTodoEvents = await TodoHistoryModel.getAllTodoHistoryEvents();
