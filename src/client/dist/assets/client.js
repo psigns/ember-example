@@ -46,22 +46,52 @@ define('client/components/todo-listing', ['exports'], function (exports) {
   });
   exports.default = Ember.Component.extend({
     isComplete: false,
+    isEditable: false,
 
     didReceiveAttrs() {
       this.isComplete = this.get('todo').status === 'COMPLETE';
     },
 
     actions: {
-      toggleComplete(e) {
-        let todo = this.get('todo');
-
-        Ember.set(todo, 'status', e.target.checked ? 'COMPLETE' : 'INCOMPLETE');
-        todo.save();
-      },
       deleteTodo() {
         let todo = this.get('todo');
 
         todo.destroyRecord();
+      },
+
+      doneEditing(todoText) {
+        if (!this.get('isEditable')) {
+          return;
+        }
+        if (Ember.isBlank(todoText)) {
+          this.deleteTodo();
+        } else {
+          let todo = this.get('todo');
+
+          this.set('isEditable', false);
+          Ember.set(todo, 'text', todoText);
+          todo.save();
+        }
+      },
+
+      handleKeydown(e) {
+        if (e.keyCode === 13) {
+          e.target.blur();
+        } else if (e.keyCode === 27) {
+          this.set('isEditable', false);
+        }
+      },
+      setToEditableIfIncomplete() {
+        if (!this.isComplete) {
+          this.set('isEditable', true);
+        }
+      },
+      toggleComplete(e) {
+        let todo = this.get('todo');
+
+        this.set('isComplete', !this.isComplete);
+        Ember.set(todo, 'status', e.target.checked ? 'COMPLETE' : 'INCOMPLETE');
+        todo.save();
       }
     }
   });
@@ -94,9 +124,8 @@ define('client/controllers/application', ['exports'], function (exports) {
           });
 
           newPost.save().then(() => {
-            // https://github.com/emberjs/data/issues/1829
             let parent = this.store.peekAll('todo');
-            let filtered = parent.filter(data => get(data, 'id') === null);
+            let filtered = parent.filter(data => this.get(data, 'id') === null);
 
             filtered.forEach(item => item.deleteRecord());
           });
@@ -373,7 +402,7 @@ define("client/templates/application", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "ZEgxCdHk", "block": "{\"symbols\":[],\"statements\":[[6,\"h1\"],[8],[0,\"Todo app\"],[9],[0,\"\\n\"],[6,\"nav\"],[8],[0,\"\\n\"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"menu__link--all-todos\"]],{\"statements\":[[0,\"      All\\n\"]],\"parameters\":[]},null],[4,\"link-to\",[\"active\"],[[\"class\"],[\"menu__link--active-todos\"]],{\"statements\":[[0,\"      Active\\n\"]],\"parameters\":[]},null],[4,\"link-to\",[\"completed\"],[[\"class\"],[\"menu__link--completed-todos\"]],{\"statements\":[[0,\"      Completed\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"input\"],[10,\"id\",\"new-todo\"],[11,\"onkeydown\",[26,\"action\",[[21,0,[]],\"createTodo\"],null],null],[10,\"placeholder\",\"What needs to be done?\"],[10,\"autofocus\",\"\"],[10,\"type\",\"text\"],[8],[9],[0,\"\\n\"],[9],[0,\"\\n\"],[6,\"div\"],[8],[0,\"\\n\"],[9],[0,\"\\n\"],[1,[20,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "client/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ostBC3rq", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[10,\"class\",\"app__container--outer\"],[8],[0,\"\\n  \"],[6,\"div\"],[10,\"class\",\"app__container--inner\"],[8],[0,\"\\n    \"],[6,\"div\"],[10,\"class\",\"app__header\"],[8],[0,\"\\n      \"],[6,\"h1\"],[8],[0,\"Todo app\"],[9],[0,\"\\n      \"],[6,\"input\"],[10,\"id\",\"new-todo\"],[11,\"onkeydown\",[26,\"action\",[[21,0,[]],\"createTodo\"],null],null],[10,\"placeholder\",\"What to do?\"],[10,\"autofocus\",\"\"],[10,\"type\",\"text\"],[8],[9],[0,\"\\n    \"],[9],[0,\"\\n    \"],[1,[20,\"outlet\"],false],[0,\"\\n    \"],[6,\"nav\"],[8],[0,\"\\n\"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"menu__link menu__link--all-todos\"]],{\"statements\":[[0,\"        All\\n\"]],\"parameters\":[]},null],[4,\"link-to\",[\"active\"],[[\"class\"],[\"menu__link menu__link--active-todos\"]],{\"statements\":[[0,\"        Active\\n\"]],\"parameters\":[]},null],[4,\"link-to\",[\"completed\"],[[\"class\"],[\"menu__link menu__link--completed-todos\"]],{\"statements\":[[0,\"        Completed\\n\"]],\"parameters\":[]},null],[0,\"    \"],[9],[0,\"\\n  \"],[9],[0,\"\\n\"],[9]],\"hasEval\":false}", "meta": { "moduleName": "client/templates/application.hbs" } });
 });
 define("client/templates/completed", ["exports"], function (exports) {
   "use strict";
@@ -397,7 +426,7 @@ define("client/templates/components/todo-listing", ["exports"], function (export
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "1hT9aqVv", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[8],[0,\"\\n  \"],[6,\"h3\"],[8],[0,\"\\n    \"],[6,\"input\"],[11,\"onclick\",[26,\"action\",[[21,0,[]],\"toggleComplete\"],null],null],[11,\"checked\",[26,\"if\",[[22,[\"isComplete\"]],true],null],null],[10,\"type\",\"checkbox\"],[8],[9],[0,\"\\n    \"],[1,[22,[\"todo\",\"text\"]],false],[0,\"\\n  \"],[9],[0,\"\\n  \"],[6,\"button\"],[11,\"onclick\",[26,\"action\",[[21,0,[]],\"deleteTodo\"],null],null],[8],[0,\"Delete\"],[9],[0,\"\\n  \"],[6,\"div\"],[8],[1,[22,[\"todo\",\"id\"]],false],[9],[0,\"\\n\"],[9]],\"hasEval\":false}", "meta": { "moduleName": "client/templates/components/todo-listing.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "8frncvGn", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[10,\"class\",\"todo__container--outer\"],[8],[0,\"\\n  \"],[6,\"div\"],[10,\"class\",\"todo__container--inner\"],[8],[0,\"\\n    \"],[6,\"h3\"],[8],[0,\"\\n      \"],[6,\"input\"],[11,\"onclick\",[26,\"action\",[[21,0,[]],\"toggleComplete\"],null],null],[11,\"checked\",[26,\"if\",[[22,[\"isComplete\"]],true],null],null],[10,\"type\",\"checkbox\"],[8],[9],[0,\"\\n\"],[4,\"if\",[[22,[\"isEditable\"]]],null,{\"statements\":[[0,\"        \"],[6,\"input\"],[10,\"autofocus\",\"\"],[11,\"onblur\",[26,\"action\",[[21,0,[]],\"doneEditing\"],[[\"value\"],[\"target.value\"]]],null],[11,\"onkeydown\",[26,\"action\",[[21,0,[]],\"handleKeydown\"],null],null],[11,\"value\",[22,[\"todo\",\"text\"]],null],[10,\"type\",\"text\"],[8],[9],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[11,\"ondblclick\",[26,\"action\",[[21,0,[]],\"setToEditableIfIncomplete\"],null],null],[8],[1,[22,[\"todo\",\"text\"]],false],[9],[0,\"\\n\"]],\"parameters\":[]}],[0,\"    \"],[9],[0,\"\\n  \"],[9],[0,\"\\n  \"],[6,\"div\"],[10,\"class\",\"delete\"],[11,\"onclick\",[26,\"action\",[[21,0,[]],\"deleteTodo\"],null],null],[8],[0,\"Delete\"],[9],[0,\"\\n\"],[9]],\"hasEval\":false}", "meta": { "moduleName": "client/templates/components/todo-listing.hbs" } });
 });
 define("client/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -429,6 +458,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("client/app")["default"].create({"name":"client","version":"0.0.0+281c88eb"});
+  require("client/app")["default"].create({"name":"client","version":"0.0.0+dc8d06f5"});
 }
 //# sourceMappingURL=client.map

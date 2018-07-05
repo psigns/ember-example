@@ -1,0 +1,59 @@
+body {
+  background: #EEE;
+  color: #444;
+  font-family: "Titillium Web", Arial, Helvetica, sans-serif;
+}
+
+input[type=text] {
+  font-size: 1em;
+  height: 2em;
+}
+
+.app__container--outer {
+  display: flex;
+  justify-content: center;
+}
+
+.app__container--inner {
+  background: #FFF;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  margin-top: 16px;
+  min-width: 600px;
+  padding: 16px;
+}
+
+.app__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app__header input {
+  width: 100%;
+}
+
+.todo__container--outer {
+  align-items: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 0 16px;
+}
+
+nav {
+  margin-top: 16px;
+}
+
+.menu__link:not(:last-child) {
+  margin-right: 8px;
+}
+
+.todo__container--inner {
+  align-items: center;
+  display: flex;
+}
+
+.delete {
+  cursor: pointer;
+}

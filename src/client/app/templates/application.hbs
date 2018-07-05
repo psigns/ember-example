@@ -1,16 +1,20 @@
-<h1>Todo app</h1>
-<nav>
-    {{#link-to "index" class="menu__link--all-todos"}}
-      All
-    {{/link-to}}
-    {{#link-to "active" class="menu__link--active-todos"}}
-      Active
-    {{/link-to}}
-    {{#link-to "completed" class="menu__link--completed-todos"}}
-      Completed
-    {{/link-to}}
-    <input type="text" id="new-todo" onkeydown={{action 'createTodo'}} placeholder="What needs to be done?" autofocus>
-</nav>
-<div>
+<div class="app__container--outer">
+  <div class="app__container--inner">
+    <div class="app__header">
+      <h1>Todo app</h1>
+      <input type="text" id="new-todo" onkeydown={{action 'createTodo'}} placeholder="What to do?" autofocus>
+    </div>
+    {{outlet}}
+    <nav>
+      {{#link-to "index" class="menu__link menu__link--all-todos"}}
+        All
+      {{/link-to}}
+      {{#link-to "active" class="menu__link menu__link--active-todos"}}
+        Active
+      {{/link-to}}
+      {{#link-to "completed" class="menu__link menu__link--completed-todos"}}
+        Completed
+      {{/link-to}}
+    </nav>
+  </div>
 </div>
-{{outlet}}

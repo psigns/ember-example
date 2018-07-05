@@ -46,7 +46,7 @@ define('client/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/application.js should pass ESLint\n\n6:32 - Use import { isBlank } from \'@ember/utils\'; instead of using Ember.isBlank (ember/new-module-imports)\n6:32 - \'Ember\' is not defined. (no-undef)\n14:50 - \'get\' is not defined. (no-undef)');
+    assert.ok(true, 'controllers/application.js should pass ESLint\n\n');
   });
 
   QUnit.test('models/todo.js', function (assert) {

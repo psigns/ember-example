@@ -31,7 +31,7 @@ module.exports = function() {
         .expect('Content-Type', /json/);
     });
 
-    it('returns an empty array when no todo in database', async function() {
+    it('returns an todos object with empty array when no todos in database', async function() {
       const response = await request(app)
         .get(baseTodoRoute)
         .expect('Content-Type', /json/);
@@ -44,17 +44,16 @@ module.exports = function() {
       await TodosModel.createTodo('todo 2');
       await TodosModel.createTodo('todo 3');
 
-      return request(app)
+      const response = await request(app)
         .get(baseTodoRoute)
-        .expect('Content-Type', /json/)
-        .then(response => {
-          assert(response.body.todos.length === 3);
-          assert(response.body.todos[0].text === 'todo 1');
-          assert(response.body.todos[1].text === 'todo 2');
-          assert(response.body.todos[2].text === 'todo 3');
-          assert(response.body.todos.every(todo => todo.status === 'INCOMPLETE'));
-          assert(response.body.todos.every(todo => todo.hasOwnProperty('id')));
-        });
+        .expect('Content-Type', /json/);
+
+      assert(response.body.todos.length === 3);
+      assert(response.body.todos[2].text === 'todo 1');
+      assert(response.body.todos[1].text === 'todo 2');
+      assert(response.body.todos[0].text === 'todo 3');
+      assert(response.body.todos.every(todo => todo.status === 'INCOMPLETE'));
+      assert(response.body.todos.every(todo => todo.hasOwnProperty('id')));
     });
   });
 

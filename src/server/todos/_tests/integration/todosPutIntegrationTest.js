@@ -53,9 +53,9 @@ module.exports = function() {
           }
         });
 
-      assert(response.body.hasOwnProperty('id'));
-      assert(response.body.hasOwnProperty('status'));
-      assert(response.body.hasOwnProperty('text'));
+      assert(response.body.todo.hasOwnProperty('id'));
+      assert(response.body.todo.hasOwnProperty('status'));
+      assert(response.body.todo.hasOwnProperty('text'));
     });
 
     it('returns a 404 status if the todo does not exist', async function() {

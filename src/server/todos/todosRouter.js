@@ -53,7 +53,7 @@ router.put('/:id', async (req, res) => {
 
     await TodoHistoryModel.createEditEvent(req.params.id);
 
-    return res.json(updatedTodo);
+    return res.json({ todo: updatedTodo });
   } catch (error) {
     res.status(404).json({ error });
   }

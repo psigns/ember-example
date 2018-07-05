@@ -4,7 +4,8 @@ class TodosModel {
   static async getAllTodos() {
     return knex
       .select()
-      .table('todos');
+      .table('todos')
+      .orderBy('id', 'desc');
   }
 
   static async getTodoById(id) {
@@ -12,8 +13,7 @@ class TodosModel {
       const todos = await knex
         .select()
         .from('todos')
-        .where('id', id)
-        .orderBy('id', 'asc');
+        .where('id', id);
       if (todos.length) {
         return todos[0];
       } else {

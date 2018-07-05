@@ -1,8 +1,17 @@
-<div>
-  <h3>
-    <input type="checkbox" onclick={{ action 'toggleComplete' }} checked={{if isComplete true}}/>
-    {{todo.text}}
-  </h3>
-  <button onclick={{ action 'deleteTodo' }}>Delete</button>
-  <div>{{todo.id}}</div>
+<div class="todo__container--outer">
+  <div class="todo__container--inner">
+    <h3>
+      <input type="checkbox" onclick={{ action 'toggleComplete' }} checked={{if isComplete true}}/>
+      {{#if isEditable}}
+        <input autofocus
+          type="text"
+          onblur={{action 'doneEditing' value='target.value'}}
+          onkeydown={{action 'handleKeydown'}}
+          value={{todo.text}} />
+      {{else}}
+        <span ondblclick={{ action 'setToEditableIfIncomplete'}}>{{todo.text}}</span>
+      {{/if}}
+    </h3>
+  </div>
+  <div class="delete" onclick={{ action 'deleteTodo' }}>Delete</div>
 </div>
