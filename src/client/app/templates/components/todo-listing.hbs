@@ -1,0 +1,8 @@
+<div>
+  <h3>
+    <input type="checkbox" onclick={{ action 'toggleComplete' }} checked={{if isComplete true}}/>
+    {{todo.text}}
+  </h3>
+  <button onclick={{ action 'deleteTodo' }}>Delete</button>
+  <div>{{todo.id}}</div>
+</div>
